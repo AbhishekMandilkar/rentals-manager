@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Loan {
+model loan {
   id               String      @id @default(uuid())
   borrowerName     String
   borrowerPhone    String
@@ -15,28 +15,28 @@ model Loan {
   interestRate     Float
   dateLent         DateTime
   dateRepayment    DateTime
-  status           LoanStatus
-  repaymentMode    RepaymentMode
+  status           loanStatus
+  repaymentMode    repaymentMode
   userId           String      // Identifies the user who created the loan
-  repayments       Repayment[] // Relation to repayment entries
+  repayments       repayment[] // Relation to repayment entries
   isDeleted        Boolean     @default(false) // Soft delete flag
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 }
 
-model Repayment {
+model repayment {
   id        String    @id @default(uuid())
   loanId    String
-  loan      Loan      @relation(fields: [loanId], references: [id])
+  loan      loan      @relation(fields: [loanId], references: [id])
   date      DateTime
   amount    Float
-  mode      RepaymentMode
+  mode      repaymentMode
   userId    String    // Identifies the user who recorded the repayment
   isDeleted Boolean   @default(false) // Soft delete flag
   createdAt DateTime  @default(now())
 }
 
-model Tenant {
+model tenant {
   id         String        @id @default(uuid())
   name       String
   phone      String
@@ -44,16 +44,16 @@ model Tenant {
   rent       Float
   rentDueDate DateTime
   userId     String        // Identifies the user managing the tenant
-  payments   RentPayment[] // Relation to rent payments
+  payments   rentpayment[] // Relation to rent payments
   isDeleted  Boolean       @default(false) // Soft delete flag
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 }
 
-model RentPayment {
+model rentpayment {
   id        String    @id @default(uuid())
   tenantId  String
-  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  tenant    tenant    @relation(fields: [tenantId], references: [id])
   date      DateTime
   amount    Float
   userId    String    // Identifies the user who recorded the rent payment
@@ -61,13 +61,13 @@ model RentPayment {
   createdAt DateTime  @default(now())
 }
 
-enum LoanStatus {
+enum loanStatus {
   ACTIVE
   REPAID
   OVERDUE
 }
 
-enum RepaymentMode {
+enum repaymentMode {
   EMI
   ONETIME
 }

@@ -1,15 +1,14 @@
-import {Building2, Home, IndianRupee} from "lucide-react"
+import {Building2, Home, IndianRupee, WalletIcon} from "lucide-react"
 
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup, SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem
 } from "@/components/ui/sidebar"
+import Link from "next/link";
 
 // Menu items.
 const items = [
@@ -32,26 +31,36 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="flex">
+        <SidebarMenuButton
+          size="lg"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+        >
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+            <WalletIcon className="size-8 bg-primary text-white p-1 rounded-md" />
+          </div>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="text-lg truncate font-extrabold font-geist">Lend Rents</span>
+          </div>
+        </SidebarMenuButton>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>LendRents</SidebarGroupLabel>
-          <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                  <SidebarMenuButton tooltip={item.title} asChild>
+                    <Link href={item.url}>
                       <item.icon />
-                      <span>{item.title}</span>
-                    </a>
+                      <span className="font-geist">{item.title}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }
