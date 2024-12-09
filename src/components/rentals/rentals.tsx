@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
+import PageHeader from "../common/page-header";
 
 const Rentals = () => {
-  return (
-    <div>Rentals</div>
-  )
-}
+  return <PageHeader headerTitle="Rentals" />;
+};
 
-export default Rentals
+export default Rentals;

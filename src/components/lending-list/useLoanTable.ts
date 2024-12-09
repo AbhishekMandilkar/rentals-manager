@@ -15,6 +15,9 @@ import {
 import { loan } from "@prisma/client"
 import { fetchLoans, LoansResponse } from "./utils"
 
+
+export const LOAN_TABLE_QUERY_KEY = 'LOAN_LISTING_QUERY'
+
 export function useLoanTable(columns: ColumnDef<loan>[]) {
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -90,7 +93,7 @@ export function useLoanTable(columns: ColumnDef<loan>[]) {
   // Data fetching using react-query
   const { data, isLoading, isError } = useQuery<LoansResponse>({
     queryKey: [
-      'loans', 
+      LOAN_TABLE_QUERY_KEY,
       sorting, 
       columnFilters, 
       pageIndex, 

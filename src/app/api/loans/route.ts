@@ -4,10 +4,9 @@ import { z } from "zod";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
+  const data = await req.json();
   try {
-    const body = await req.json();
-
     const {
       id,
       borrowerName,
@@ -17,65 +16,39 @@ export async function POST(req: NextRequest) {
       dateLent,
       dateRepayment,
       status,
-      repaymentMode,
-      userId,
-      isDeleted,
-    }: Prisma.loanCreateInput = body;
+      repaymentMode
+    } = data;
 
-    // Validate required fields
-    if (
-      !borrowerName ||
-      !borrowerPhone ||
-      !amount ||
-      !interestRate ||
-      !dateLent ||
-      !dateRepayment ||
-      !status ||
-      !repaymentMode ||
-      !userId
-    ) {
-      return NextResponse.json(
-        { message: "All required fields must be provided." },
-        { status: 400 }
-      );
-    }
-
-    const loan = await prisma.loan.upsert({
-      where: { id: id || "" }, // Use `id` if provided, otherwise create a new entry
+    const resp = await prisma.loan.upsert({
+      where: { id: id || '' },
       update: {
         borrowerName,
         borrowerPhone,
-        amount,
-        interestRate,
+        amount: parseFloat(amount),
+        interestRate: parseFloat(interestRate),
         dateLent: new Date(dateLent),
         dateRepayment: new Date(dateRepayment),
         status,
-        repaymentMode,
-        isDeleted: isDeleted ?? false,
+        repaymentMode
       },
       create: {
         borrowerName,
         borrowerPhone,
-        amount,
-        interestRate,
+        amount: parseFloat(amount),
+        interestRate: parseFloat(interestRate),
         dateLent: new Date(dateLent),
         dateRepayment: new Date(dateRepayment),
         status,
         repaymentMode,
-        userId,
-      },
-      select: {
-        id: true,
-      },
+        // To implement user authentication, uncomment the following line
+        userId: ''
+      }
     });
 
-    return NextResponse.json(loan, { status: 200 });
+    return resp
   } catch (error) {
-    console.error("Error upserting loan:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error", error: JSON.stringify(error) },
-      { status: 500 }
-    );
+    console.error('Error upserting loan:', error);
+    throw new Error('Failed to upsert loan');
   }
 }
 

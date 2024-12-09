@@ -42,12 +42,11 @@ model tenant {
   phone      String
   shopNumber String?       // Optional field
   rent       Float
-  rentDueDate DateTime
-  userId     String        // Identifies the user managing the tenant
   payments   rentpayment[] // Relation to rent payments
   isDeleted  Boolean       @default(false) // Soft delete flag
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+  userId     String        // Identifies the user who created the tenant
 }
 
 model rentpayment {
@@ -59,6 +58,7 @@ model rentpayment {
   userId    String    // Identifies the user who recorded the rent payment
   isDeleted Boolean   @default(false) // Soft delete flag
   createdAt DateTime  @default(now())
+  paidAt    DateTime? // Optional field
 }
 
 enum loanStatus {

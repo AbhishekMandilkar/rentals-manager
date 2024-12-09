@@ -2,8 +2,8 @@
 
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {CalendarIcon} from 'lucide-react'
-import {format} from "date-fns"
+import {CalendarIcon, Loader2} from 'lucide-react'
+import {add, format} from "date-fns"
 
 import {cn} from "@/lib/utils"
 import {Button} from "@/components/ui/button"
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/popover"
 import {LoanFormValues, loanSchema} from "./schema"
 import {useCreateOrUpdateLoan} from "./hooks/use-create-loans"
+import {Prisma} from "@prisma/client"
 
 
 
@@ -41,21 +42,35 @@ export function LoanForm() {
       borrowerPhone: "",
       amount: 0,
       interestRate: 0,
-      dateRepayment: new Date(),
+      dateRepayment: add(new Date(), {months: 1}),
       repaymentMode: "ONE_TIME",
     },
   })
 
-  const {  } = useCreateOrUpdateLoan();
+  const { mutate, isLoading } = useCreateOrUpdateLoan();
 
   function onSubmit(data: LoanFormValues) {
-    console.log(data)
+    const {amount, borrowerName, repaymentMode, dateRepayment, interestRate, borrowerPhone} = data;
+    mutate({
+      amount,
+      borrowerName,
+      borrowerPhone: borrowerPhone || "",
+      repaymentMode: repaymentMode as Prisma.loanCreateInput["repaymentMode"],
+      dateRepayment,
+      interestRate,
+      dateLent: new Date(),
+      status: 'ACTIVE',
+      userId: crypto.randomUUID(),
+    });
     // Here you would typically send the data to your API
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
         <FormField
           control={form.control}
           name="borrowerName"
@@ -76,7 +91,7 @@ export function LoanForm() {
             <FormItem className="flex flex-col">
               <FormLabel>Borrower Phone</FormLabel>
               <FormControl>
-                <Input placeholder="1234567890" {...field} />
+                <Input placeholder="91********" {...field} maxLength={10} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,7 +104,14 @@ export function LoanForm() {
             <FormItem className="flex flex-col">
               <FormLabel>Amount</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="1000" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                <Input
+                  type="number"
+                  placeholder="1000"
+                  min={0}
+                  {...field}
+                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                  className="[&::-webkit-inner-spin-button]:appearance-none"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -102,7 +124,13 @@ export function LoanForm() {
             <FormItem className="flex flex-col">
               <FormLabel>Interest Rate (%)</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="5" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                <Input
+                  type="number"
+                  placeholder="5"
+                  {...field}
+                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                  className="[&::-webkit-inner-spin-button]:appearance-none"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -170,9 +198,12 @@ export function LoanForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="md:col-span-2 mt-4">Submit</Button>
+        <Button type="submit" className="md:col-span-2 mt-4" disabled={isLoading}>
+          {isLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
+          Submit
+        </Button>
       </form>
     </Form>
-  )
+  );
 }
 
