@@ -6,6 +6,8 @@ import AppHeader from "@/components/app-header";
 import CustomProvider from "@/components/providers/custom-proivider";
 import Head from "next/head";
 import {SidebarInset} from "@/components/ui/sidebar";
+import NextTopLoader from 'nextjs-toploader';
+import {Toaster} from "@/components/ui/sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,16 +38,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NextTopLoader />
         <CustomProvider>
           <AppSidebar />
           <SidebarInset>
             <main className="w-full flex">
-              <div className="flex flex-col w-full">
+              <div className="flex flex-col w-full pb-20 md:pb-0">
                 <AppHeader />
                 {children}
               </div>
             </main>
           </SidebarInset>
+          <Toaster richColors position="top-right" theme="light" />
         </CustomProvider>
       </body>
     </html>

@@ -3,62 +3,69 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // Or your chosen database provider
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model loan {
-  id               String      @id @default(uuid())
-  borrowerName     String
-  borrowerPhone    String
-  amount           Float
-  interestRate     Float
-  dateLent         DateTime
-  dateRepayment    DateTime
-  status           loanStatus
-  repaymentMode    repaymentMode
-  userId           String      // Identifies the user who created the loan
-  repayments       repayment[] // Relation to repayment entries
-  isDeleted        Boolean     @default(false) // Soft delete flag
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  id            String        @id @default(uuid())
+  borrowerName  String
+  borrowerPhone String
+  amount        Float
+  dateLent      DateTime
+  status        loanStatus
+  userId        String
+  isDeleted     Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  interestRate  Float
+  repaymentMode repaymentMode
+
+  @@index([amount, status, userId, borrowerName])
+}
+
+model rent {
+  id              String      @id @default(uuid())
+  name            String
+  phone           String
+  rent            Float
+  isDeleted       Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  userId          String
+  propertyId      String?
+  contractEndDate DateTime
+  property        properties? @relation(fields: [propertyId], references: [id])
+
+  @@index([phone])
+  @@index([rent])
+  @@index([userId])
+  @@index([name, rent])
+}
+
+model properties {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  active    Boolean
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rent      rent[]
 }
 
 model repayment {
-  id        String    @id @default(uuid())
-  loanId    String
-  loan      loan      @relation(fields: [loanId], references: [id])
-  date      DateTime
-  amount    Float
-  mode      repaymentMode
-  userId    String    // Identifies the user who recorded the repayment
-  isDeleted Boolean   @default(false) // Soft delete flag
-  createdAt DateTime  @default(now())
-}
+  id           String    @id @default(uuid())
+  amount       Float
+  userId       String
+  isDeleted    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  dueDate      DateTime
+  paidAt       DateTime?
+  resourceId   String
+  resourceType String
 
-model tenant {
-  id         String        @id @default(uuid())
-  name       String
-  phone      String
-  shopNumber String?       // Optional field
-  rent       Float
-  payments   rentpayment[] // Relation to rent payments
-  isDeleted  Boolean       @default(false) // Soft delete flag
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  userId     String        // Identifies the user who created the tenant
-}
-
-model rentpayment {
-  id        String    @id @default(uuid())
-  tenantId  String
-  tenant    tenant    @relation(fields: [tenantId], references: [id])
-  date      DateTime
-  amount    Float
-  userId    String    // Identifies the user who recorded the rent payment
-  isDeleted Boolean   @default(false) // Soft delete flag
-  createdAt DateTime  @default(now())
-  paidAt    DateTime? // Optional field
+  @@index([resourceType, resourceId, dueDate, paidAt])
 }
 
 enum loanStatus {

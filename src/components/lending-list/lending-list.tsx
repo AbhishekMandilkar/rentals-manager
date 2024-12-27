@@ -1,8 +1,7 @@
 "use client";
 
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-import { ColumnDef, flexRender } from "@tanstack/react-table";
-import { loan } from "@prisma/client";
+import { ChevronDown } from "lucide-react";
+import { flexRender, Table as TanstackTable } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,117 +18,14 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useLoanTable } from "./useLoanTable";
+import { Loan, useLoanTable } from "./useLoanTable";
+import { LendingTableColumns } from "./lending-columns";
+import { useIsMobile } from "@/hooks/use-mobile";
+import BorrowerCard from "./components/borrower-card";
+import { repayment } from "@prisma/client";
 
-// Define columns outside the component to prevent re-creation on every render
-const columns: ColumnDef<loan>[] = [
-  {
-    accessorKey: "borrowerName",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Borrower Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div>{row.getValue("borrowerName")}</div>,
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Amount
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-      return <div className="font-medium">{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "interestRate",
-    header: "Interest Rate",
-    cell: ({ row }) => {
-      const interestRate = parseFloat(row.getValue("interestRate"));
-      return <div>{interestRate.toFixed(2)}%</div>;
-    },
-  },
-  {
-    accessorKey: "dateRepayment",
-    header: "Repayment Date",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("dateRepayment"));
-      return <div>{date.toLocaleDateString()}</div>;
-    },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      return (
-        <div
-          className={`font-medium ${
-            status === "ACTIVE"
-              ? "text-green-600"
-              : status === "OVERDUE"
-              ? "text-red-600"
-              : "text-blue-600"
-          }`}
-        >
-          {status}
-        </div>
-      );
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const loan = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(loan.id)}
-            >
-              Copy loan ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem>Edit loan</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
 
 const loadingView = (
   <div className="space-y-4">
@@ -143,8 +39,9 @@ const loadingView = (
 
 export function LoanListing() {
   // Use the custom hook
-  const { isLoading, isError, table } = useLoanTable(columns);
-
+  const { isLoading, isError, table, onSearch } =
+    useLoanTable(LendingTableColumns);
+  const isMobile = useIsMobile();
   if (isError) {
     return (
       <div className="text-red-500">
@@ -154,48 +51,30 @@ export function LoanListing() {
   }
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter borrowers..."
-          value={
-            (table.getColumn("borrowerName")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("borrowerName")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+    <>
+      <TableHeaderView table={table} onSearch={onSearch} isMobile={isMobile} />
       {(() => {
         if (isLoading) {
           return loadingView;
+        }
+
+        if (isMobile) {
+          return (
+            <div className="flex flex-col gap-2">
+              {table.getRowModel().rows?.map((row) => (
+                <div key={row.id}>
+                  <BorrowerCard
+                    borrowerName={row.getValue("borrowerName")}
+                    amount={row.getValue("amount")}
+                    status={row.getValue("status")}
+                    interestRate={row.getValue("interestRate")}
+                    repayments={row.getValue<repayment[]>("repayments")}
+                  />
+                </div>
+              ))}
+              <TablePaginationView table={table} />
+            </div>
+          );
         }
 
         return (
@@ -240,7 +119,7 @@ export function LoanListing() {
                   ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={columns.length}
+                        colSpan={LendingTableColumns.length}
                         className="h-24 text-center"
                       >
                         No results.
@@ -250,33 +129,88 @@ export function LoanListing() {
                 </TableBody>
               </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-              <div className="flex-1 text-sm text-muted-foreground">
-                {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
-              </div>
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
+            <TablePaginationView table={table} />
           </>
         );
       })()}
-    </div>
+    </>
   );
 }
+
+const TablePaginationView = (props: { table: TanstackTable<Loan> }) => {
+  const { table } = props;
+  return (
+    <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex-1 text-sm text-muted-foreground">
+        {table.getFilteredSelectedRowModel().rows.length} of{" "}
+        {table.getFilteredRowModel().rows.length} row(s) selected.
+      </div>
+      <div className="space-x-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const TableHeaderView = (props: {
+  table: TanstackTable<Loan>;
+  onSearch: (value: string) => void;
+  isMobile: boolean;
+}) => {
+  const { table, onSearch, isMobile } = props;
+  return (
+    <div className="flex items-center space-x-2 justify-between">
+      <Input
+        placeholder="Search borrowers..."
+        defaultValue={
+          (table.getColumn("borrowerName")?.getFilterValue() as string) ?? ""
+        }
+        onChange={(event) => onSearch(event.target.value)}
+        className="md:max-w-sm"
+      />
+      {!isMobile && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columns <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </div>
+  );
+};

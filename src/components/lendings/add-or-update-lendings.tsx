@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, {useCallback} from "react";
 
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
@@ -48,9 +48,13 @@ export function AddOrUpdateLendings(props: { id?: string, children?: React.React
     <DrawerDescription>{description}</DrawerDescription>
   );
 
+  const onClose = useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
   const formElem = (
     <div className={isDesktop ? "" : "px-4"}>
-      <LoanForm />
+      <LoanForm onClose={onClose} />
     </div>
   );
 

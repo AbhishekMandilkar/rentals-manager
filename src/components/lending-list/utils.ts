@@ -42,3 +42,9 @@ export async function fetchLoans(params?: {
 
   return response.json()
 }
+
+export const StatusBadgeClass = {
+  ACTIVE: "bg-green-100 text-green-800 hover:bg-green-100",
+  REPAID: "bg-blue-100 text-blue-800 hover:bg-blue-100",
+  OVERDUE: "bg-red-100 text-red-800 hover:bg-red-100"
+}

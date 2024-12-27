@@ -12,13 +12,18 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { loan } from "@prisma/client"
+import { loan, repayment } from "@prisma/client"
 import { fetchLoans, LoansResponse } from "./utils"
+import {debounce} from "lodash"
 
 
 export const LOAN_TABLE_QUERY_KEY = 'LOAN_LISTING_QUERY'
 
-export function useLoanTable(columns: ColumnDef<loan>[]) {
+export interface Loan extends loan {
+  repayments?: repayment[];
+}
+
+export function useLoanTable(columns: ColumnDef<Loan>[]) {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const router = useRouter()
@@ -150,11 +155,29 @@ export function useLoanTable(columns: ColumnDef<loan>[]) {
     pageCount: data?.meta.totalPages ?? 0,
   })
 
+  // Debounced search
+  const debouncedSearch = useCallback(
+    (value: string) => {
+      table.getColumn("borrowerName")?.setFilterValue(value);
+    },
+    [table]
+  );
+
+  const debounceFn = useCallback(
+    debounce(debouncedSearch, 1000) as (value: string) => void,
+    [debouncedSearch]
+  );
+
+  const onSearch = (value: string) => {
+    debounceFn(value);
+  };
+  
   return {
     loans: data?.data,
     meta: data?.meta,
     isLoading,
     isError,
     table,
+    onSearch
   }
 }

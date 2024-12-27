@@ -6,15 +6,13 @@ const PageHeader = (props: {
   headerSubtitle?: string;
   right?: React.ReactNode;
 }) => {
-  const { right, headerTitle, headerSubtitle } = props;
+  const { right, headerTitle } = props;
   return (
-    <div className="flex items-center justify-between w-full py-2 px-4 mt-2">
-      <div className="flex items-center gap-2">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight font-geist">{headerTitle}</h2>
-          <p className="text-muted-foreground font-mono">{headerSubtitle}</p>
-        </div>
+    <div className="flex items-center w-full">
+      <div className="flex flex-col space-y-1">
+        <h2 className="text-3xl font-bold tracking-tight">{headerTitle}</h2>
       </div>
+      <div className="flex-1" />
       {right}
     </div>
   );

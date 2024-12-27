@@ -1,40 +1,36 @@
-'use client'
-import {Building2, Home, IndianRupee, WalletIcon} from "lucide-react"
+"use client";
+import { Building2, Home, IndianRupee, WalletIcon } from "lucide-react";
 
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup, SidebarHeader,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
-} from "@/components/ui/sidebar"
+  SidebarMenuItem,
+  SidebarRail,
+} from "@/components/ui/sidebar";
 import Link from "next/link";
-import {usePathname} from "next/navigation";
+import { usePathname } from "next/navigation";
+import { NavUser } from "./nav-user";
+import {useIsMobile} from "@/hooks/use-mobile";
+import {NavItems} from "./app-config";
+import {BottomNavbar} from "./app-navbar";
 
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Lendings",
-    url: "/lendings",
-    icon: IndianRupee,
-  },
-  {
-    title: "Rentals",
-    url: "/rentals",
-    icon: Building2,
-  },
-]
 
 export function AppSidebar() {
   const router = usePathname();
+  const isMobile = useIsMobile();
+  const pathname = usePathname()
+
+  if (isMobile) {
+    return <BottomNavbar activeTab={pathname} />;
+  }
+
   return (
-    <Sidebar collapsible="icon" className="bg-gray-50">
+    <Sidebar collapsible="icon">
       <SidebarHeader className="flex">
         <SidebarMenuButton
           size="lg"
@@ -53,7 +49,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {items.map((item) => (
+            {NavItems.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   tooltip={item.title}
@@ -62,8 +58,23 @@ export function AppSidebar() {
                   className="bg-sidebar-background"
                 >
                   <Link href={item.url}>
-                    <item.icon />
-                    <span className="font-geist">{item.title}</span>
+                    <item.icon
+                      className={`${
+                        pathname === item.url
+                          ? "text-primary"
+                          : "text-sidebar-foreground"
+                      }`}
+                      size={20}
+                    />
+                    <span
+                      className={`font-geist ${
+                        pathname === item.url
+                          ? "text-primary"
+                          : "text-sidebar-foreground"
+                      }`}
+                    >
+                      {item.title}
+                    </span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -71,6 +82,10 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }
