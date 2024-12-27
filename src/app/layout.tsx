@@ -1,13 +1,12 @@
-import type {Metadata} from "next";
+import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import {AppSidebar} from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 import AppHeader from "@/components/app-header";
 import CustomProvider from "@/components/providers/custom-proivider";
-import Head from "next/head";
-import {SidebarInset} from "@/components/ui/sidebar";
-import NextTopLoader from 'nextjs-toploader';
-import {Toaster} from "@/components/ui/sonner";
+import { SidebarInset } from "@/components/ui/sidebar";
+import NextTopLoader from "nextjs-toploader";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,19 +31,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Head>
-        <link rel="icon" href="../assests/favicon_io/favicon.ico" sizes="any" />
-      </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextTopLoader />
         <CustomProvider>
-          <AppSidebar />
+          <AppSidebar /> 
           <SidebarInset>
             <main className="w-full flex">
               <div className="flex flex-col w-full pb-20 md:pb-0">
-                <AppHeader />
+                <AppHeader /> 
                 {children}
               </div>
             </main>

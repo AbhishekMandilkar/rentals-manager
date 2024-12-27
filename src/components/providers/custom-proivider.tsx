@@ -1,13 +1,11 @@
 "use client";
 import React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
+import {QueryClient, QueryClientProvider} from "react-query";
 import {SidebarProvider} from "../ui/sidebar";
 import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-} from '@clerk/nextjs'
+  ClerkProvider, SignedIn,
+  SignedOut
+} from '@clerk/nextjs';
 import LandingPage from "../landing-page/landing-page";
 
 // Create a client

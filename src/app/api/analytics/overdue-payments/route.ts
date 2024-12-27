@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 
-export async function GET(req: Request) {
-  const overduePaymentsCount = await prisma.repayment.count({
+export async function GET() {
+  const overduePaymentsCount = await prisma?.repayment?.count({
     where: {
       dueDate: {
         lt: new Date(),

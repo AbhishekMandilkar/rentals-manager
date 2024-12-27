@@ -1,3 +1,4 @@
+export const revalidate = 0
 import {
   Card,
   CardContent,
@@ -11,23 +12,30 @@ import { RecentTransactions } from "./components/recent-transactions";
 import { LoanDistribution } from "./components/loan-distribution";
 import { RentalOccupancy } from "./components/rental-occupancy"
 import PageHeader from "../common/page-header";
+import prisma from "@/lib/prisma";
+
+const fetchAnalytics = async () => {
+  return await Promise.all([
+    prisma.loan.count({
+      where: {
+        status: "ACTIVE",
+        isDeleted: false,
+      },
+    }),
+    prisma?.repayment?.count({
+      where: {
+        dueDate: {
+          lt: new Date(),
+        },
+        paidAt: null,
+        isDeleted: false,
+      },
+    }),
+  ]);
+}
 
 export default async function AnalyticsPage() {
-  const [activeLoans, overduePayments] = await Promise.all([
-    fetch("http://localhost:3000/api/analytics/active-loans").then((res) =>
-      res.json()
-    ),
-    fetch("http://localhost:3000/api/analytics/overdue-payments").then((res) =>
-      res.json()
-    ),
-    //   fetch("http://localhost:3000/api/analytics/monthly-income").then((res) =>
-    //     res.json()
-    //   ),
-
-    //   fetch("http://localhost:3000/api/analytics/rented-shops").then((res) =>
-    //     res.json()
-    //   ),
-  ]);
+  const [activeLoans, overduePayment] = await fetchAnalytics();
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <PageHeader headerTitle="Analytics" />
@@ -59,7 +67,7 @@ export default async function AnalyticsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{activeLoans?.count}</div>
+                <div className="text-2xl font-bold">{activeLoans}</div>
                 <p className="text-xs text-muted-foreground">
                   +2 from last month
                 </p>
@@ -85,7 +93,7 @@ export default async function AnalyticsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{overduePayments?.count}</div>
+                <div className="text-2xl font-bold">{overduePayment}</div>
                 <p className="text-xs text-muted-foreground">
                   -2 from last month
                 </p>

@@ -1,21 +1,14 @@
-import { Button } from "@/components/ui/button";
+import {Button} from "@/components/ui/button";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  CardContent
 } from "@/components/ui/card";
 import {
-  ArrowRight,
-  BarChart3Icon,
-  Building2Icon,
-  CheckCircle,
-  PlayCircle,
-  WalletIcon,
+  ArrowRight, PlayCircle,
+  WalletIcon
 } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import {motion} from "framer-motion";
 import {
   Accordion,
   AccordionContent,
@@ -23,7 +16,7 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import FeatureCards from "./features";
-import { SignInButton, useAuth } from "@clerk/nextjs";
+import {SignInButton} from "@clerk/nextjs";
 import HowItWorksSection from "./working";
 
 export default function LandingPage() {

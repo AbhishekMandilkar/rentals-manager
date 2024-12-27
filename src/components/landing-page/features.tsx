@@ -1,6 +1,5 @@
-import React from 'react'
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '../ui/card';
-import {BarChart3Icon, Building2Icon, CheckCircleIcon, Icon, WalletIcon} from 'lucide-react';
+import {BarChart3Icon, Building2Icon, CheckCircleIcon, WalletIcon} from 'lucide-react';
 
 const feats = [
     {

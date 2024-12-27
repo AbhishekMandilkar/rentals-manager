@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
     );
 
     return NextResponse.json(result);
-  } catch (e) {
+  } catch {
     // Error handling
     return NextResponse.json(
       { error: "Failed to retrieve rents" },
