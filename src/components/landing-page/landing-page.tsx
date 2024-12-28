@@ -28,13 +28,15 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen font-geist py-2">
       <header className="px-6 lg:px-10 h-14 flex items-center">
-        <Link className="flex items-center justify-center space-x-2" href="#">
+        <Link className="flex flex-1 items-center justify-between space-x-2" href="#">
+        <span className="flex items-center space-x-2">
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             <WalletIcon className="size-8 bg-primary text-white p-1 rounded-md" />
           </div>
           <span className="text-lg truncate font-geist">Lend Rents</span>
+          </span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6 font-geist">
+        <nav className="ml-auto gap-4 sm:gap-6 font-geist hidden md:flex">
           <Link
             className="text-sm hover:underline underline-offset-4"
             href="#features"
@@ -103,7 +105,7 @@ export default function LandingPage() {
           className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800 rounded-lg"
         >
           <div className="container">
-            <h1 className="text-3xl font-bold text-center mb-8">
+            <h1 className="text-3xl font-bold text-center mb-8 px-4">
               Designed to streamline rental and lending management for growing
               businesses.
             </h1>

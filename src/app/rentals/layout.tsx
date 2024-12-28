@@ -29,7 +29,7 @@ export default function RootLayout({
               trigger={
                 <Button className="ml-auto">
                   <PlusIcon className="h-4 w-4" />
-                  Add Rental
+                  <p className="hidden md:block "> Add Rental</p>
                 </Button>
               }
             >

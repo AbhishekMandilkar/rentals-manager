@@ -27,7 +27,7 @@ export function Properties() {
       trigger={
         <Button variant="outline">
           <Settings2 />
-          Manage Properties
+          <p className="hidden md:block ">Manage Properties</p>
         </Button>
       }
     >
