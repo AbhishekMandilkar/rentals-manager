@@ -24,7 +24,7 @@ import { Loan, useLoanTable } from "./useLoanTable";
 import { LendingTableColumns } from "./lending-columns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import BorrowerCard from "./components/borrower-card";
-import { repayment } from "@prisma/client";
+import {Repayment} from "../rentals/rental-columns";
 
 
 const loadingView = (
@@ -68,7 +68,7 @@ export function LoanListing() {
                     amount={row.getValue("amount")}
                     status={row.getValue("status")}
                     interestRate={row.getValue("interestRate")}
-                    repayments={row.getValue<repayment[]>("repayments")}
+                    repayments={row.getValue<Repayment[]>("repayments")}
                   />
                 </div>
               ))}

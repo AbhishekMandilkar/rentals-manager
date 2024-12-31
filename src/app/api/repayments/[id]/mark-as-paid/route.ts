@@ -1,12 +1,20 @@
 import { markRepaymentAsPaid } from "@/services/repayments/repayments";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const result = await markRepaymentAsPaid({ id: params.id });
+    const repaymentId = (await params)?.id;
+
+    if (!repaymentId) {
+      return NextResponse.json(
+        { error: "Failed to mark repayment as paid" },
+        { status: 400 }
+      );
+    }
+    const result = await markRepaymentAsPaid({ id: repaymentId });
     return NextResponse.json(result);
   } catch {
     return NextResponse.json(
