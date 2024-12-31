@@ -1,4 +1,4 @@
-import { repayment } from "@prisma/client";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
@@ -16,6 +16,7 @@ import { StatusBadgeClass } from "./utils";
 import { formatCurrency, toTitleCase } from "@/utils";
 import UpcomingPayment from "./components/upcoming-payment";
 import {Loan} from "./useLoanTable";
+import {Repayment} from "../rentals/rental-columns";
 
 
 export const LendingTableColumns: ColumnDef<Loan>[] = [
@@ -64,12 +65,11 @@ export const LendingTableColumns: ColumnDef<Loan>[] = [
     accessorKey: "repayments",
     header: "Upcoming Payment",
     cell: ({ row }) => {
-      const payments = row.getValue<repayment[]>("repayments");
+      const payments = row.getValue<Repayment[]>("repayments");
       if (payments?.length) {
         return (
           <UpcomingPayment
-            amount={payments[0].amount}
-            dueDate={new Date(payments[0]?.dueDate).toISOString()}
+            reypayment={payments[0]}
           />
         );
       }

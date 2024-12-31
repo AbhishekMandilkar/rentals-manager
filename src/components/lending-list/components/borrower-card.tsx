@@ -7,8 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadgeClass } from "../utils";
-import { loanStatus, repayment } from "@prisma/client";
+import { loanStatus } from "@prisma/client";
 import UpcomingPayment from "./upcoming-payment";
+import {Repayment} from "@/components/rentals/rental-columns";
 
 interface BorrowerCardProps {
   borrowerName: string;
@@ -17,7 +18,7 @@ interface BorrowerCardProps {
   status: loanStatus;
   actionView?: React.ReactNode;
   onClick?: () => void;
-  repayments?: repayment[];
+  repayments?: Repayment[];
 }
 
 const BorrowerCard: React.FC<BorrowerCardProps> = ({
@@ -64,8 +65,7 @@ const BorrowerCard: React.FC<BorrowerCardProps> = ({
           </div>
           {repayments && repayments.length > 0 && (
             <UpcomingPayment
-              dueDate={new Date(repayments?.[0].dueDate).toISOString()}
-              amount={repayments[0].amount}
+              reypayment={repayments?.[0]}
             />
           )}
         </div>

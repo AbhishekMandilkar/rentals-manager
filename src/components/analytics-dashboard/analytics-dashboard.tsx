@@ -1,4 +1,4 @@
-export const revalidate = 0
+export const revalidate = 0;
 import {
   Card,
   CardContent,
@@ -10,32 +10,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "./components/overview";
 import { RecentTransactions } from "./components/recent-transactions";
 import { LoanDistribution } from "./components/loan-distribution";
-import { RentalOccupancy } from "./components/rental-occupancy"
+import { RentalOccupancy } from "./components/rental-occupancy";
 import PageHeader from "../common/page-header";
-import prisma from "@/lib/prisma";
-
-const fetchAnalytics = async () => {
-  return await Promise.all([
-    prisma.loan.count({
-      where: {
-        status: "ACTIVE",
-        isDeleted: false,
-      },
-    }),
-    prisma?.repayment?.count({
-      where: {
-        dueDate: {
-          lt: new Date(),
-        },
-        paidAt: null,
-        isDeleted: false,
-      },
-    }),
-  ]);
-}
+import { formatCurrency } from "@/utils";
+import { auth } from "@clerk/nextjs/server";
+import fetchAnalytics from "./api";
 
 export default async function AnalyticsPage() {
-  const [activeLoans, overduePayment] = await fetchAnalytics();
+  const { userId } = await auth();
+  const [activeLoans, overduePayment, monthlyIncome, rentedShops] = userId
+    ? await fetchAnalytics(userId)
+    : [0, 0, 0];
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <PageHeader headerTitle="Analytics" />
@@ -47,19 +32,23 @@ export default async function AnalyticsPage() {
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Monthly Income
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">₹45,231.89</div>
-                <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
-              </CardContent>
-            </Card>
+            {monthlyIncome && (
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Monthly Income
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(monthlyIncome)}
+                  </div>
+                  {/* <p className="text-xs text-muted-foreground">
+                    +20.1% from last month
+                  </p> */}
+                </CardContent>
+              </Card>
+            )}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -68,9 +57,9 @@ export default async function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{activeLoans}</div>
-                <p className="text-xs text-muted-foreground">
+                {/* <p className="text-xs text-muted-foreground">
                   +2 from last month
-                </p>
+                </p> */}
               </CardContent>
             </Card>
             <Card>
@@ -80,10 +69,10 @@ export default async function AnalyticsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">14</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-2xl font-bold">{rentedShops}</div>
+                {/* <p className="text-xs text-muted-foreground">
                   +1 from last month
-                </p>
+                </p> */}
               </CardContent>
             </Card>
             <Card>
@@ -94,9 +83,9 @@ export default async function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{overduePayment}</div>
-                <p className="text-xs text-muted-foreground">
+                {/* <p className="text-xs text-muted-foreground">
                   -2 from last month
-                </p>
+                </p> */}
               </CardContent>
             </Card>
           </div>

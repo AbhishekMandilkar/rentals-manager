@@ -19,7 +19,7 @@ interface Property {
   name: string;
 }
 
-interface Repayment {
+export interface Repayment {
   id: string;
   amount: number;
   dueDate: string;
@@ -93,12 +93,7 @@ export const RentalTableColumns: ColumnDef<Rent>[] = [
     cell: ({ row }) => {
       const payment = row.getValue<Repayment | undefined>("repayment");
       if (payment) {
-        return (
-          <UpcomingPayment
-            amount={payment.amount}
-            dueDate={payment.dueDate}
-          />
-        );
+        return <UpcomingPayment reypayment={payment} />;
       }
       return null;
     },

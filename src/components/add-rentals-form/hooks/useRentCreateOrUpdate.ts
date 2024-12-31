@@ -3,6 +3,7 @@ import { apiClient } from "@/lib/apiClient";
 import { useMutation } from "react-query";
 import { toast } from "sonner";
 import {RentalFormValues} from "../rental-form-schema";
+import {RENTAL_TABLE_QUERY_KEY} from "@/components/rentals/useRentalTable";
 
 export const useRentCreateOrUpdate = () => {
   return useMutation({
@@ -17,7 +18,7 @@ export const useRentCreateOrUpdate = () => {
     onSuccess: (data, variables) => {
       // Invalidate and refetch rent-related queries
       queryClient.invalidateQueries({
-        queryKey: ["rents"],
+        queryKey: [RENTAL_TABLE_QUERY_KEY],
       });
 
       // Optionally, you can handle toast or other success notifications

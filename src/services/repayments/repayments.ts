@@ -46,6 +46,7 @@ export const getResourceRepaymentsMap = async ({
       resourceType: resourceType,
       userId,
       isDeleted: false,
+      paidAt: null,
     },
     orderBy: {
       createdAt: "desc",
@@ -54,6 +55,7 @@ export const getResourceRepaymentsMap = async ({
       dueDate: true,
       amount: true,
       resourceId: true,
+      id: true,
     },
   });
   const repaymentMap = new Map<string, typeof repayments>();
@@ -70,3 +72,32 @@ export const getResourceRepaymentsMap = async ({
 
   return repaymentMap;
 };
+
+
+export const markRepaymentAsPaid = async ({
+  id,
+}: {
+  id: string;
+}) => {
+  try {
+    const updatedRepayment = await prisma.repayment.update({
+      where: {
+        id,
+        isDeleted: false,
+      },
+      data: {
+        paidAt: new Date(),
+      },
+      select: {
+        id: true,
+        amount: true,
+        paidAt: true,
+        dueDate: true,
+      },
+    });
+
+    return updatedRepayment;
+  } catch (error) {
+    throw new Error(`Failed to mark repayment as paid: ${error}`);
+  }
+}

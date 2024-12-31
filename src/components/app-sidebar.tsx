@@ -1,5 +1,5 @@
 "use client";
-import { Building2, Home, IndianRupee, WalletIcon } from "lucide-react";
+import {WalletIcon} from "lucide-react";
 
 import {
   Sidebar,
@@ -13,8 +13,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { NavUser } from "./nav-user";
+import {usePathname} from "next/navigation";
+import {NavUser} from "./nav-user";
 import {useIsMobile} from "@/hooks/use-mobile";
 import {NavItems} from "./app-config";
 import {BottomNavbar} from "./app-navbar";
@@ -30,7 +30,7 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="bg-primary-foreground">
       <SidebarHeader className="flex">
         <SidebarMenuButton
           size="lg"
@@ -64,10 +64,9 @@ export function AppSidebar() {
                           ? "text-primary"
                           : "text-sidebar-foreground"
                       }`}
-                      size={20}
                     />
                     <span
-                      className={`font-geist ${
+                      className={`font-geist text-md ${
                         pathname === item.url
                           ? "text-primary"
                           : "text-sidebar-foreground"
